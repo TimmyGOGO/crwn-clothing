@@ -19,19 +19,29 @@ class App extends React.Component {
   unsubscribeFromAuth = null;
 
   componentDidMount() {
+    // подвязываем к переменной обработчик, который будет следить за состоянием авторизации:
     this.unsubscribeFromAuth = auth.onAuthStateChanged(async (userAuth) => {
+      // если есть данные по пользователю (он авторизовался):
       if (userAuth) {
+        // берем ссылку из БД на документ про пользователя (либо создаем нового и его ссылку возвращаем):
         const userRef = await createUserProfileDocument(userAuth);
 
+        // берем срез данных и обновляем state:
         userRef.onSnapshot((snapShot) => {
-          this.setState({
-            currentUser: {
-              id: snapShot.id,
-              ...snapShot.data(),
+          this.setState(
+            {
+              currentUser: {
+                id: snapShot.id,
+                ...snapShot.data(),
+              },
             },
-          });
+            () => {
+              console.log(this.state);
+            }
+          );
         });
       } else {
+        // если данных нет (пользователь вышел из системы):
         this.setState({
           currentUser: userAuth,
         });

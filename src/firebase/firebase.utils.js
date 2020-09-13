@@ -13,14 +13,18 @@ const config = {
   measurementId: "G-Z8FKR97PBP",
 };
 
+// создание пользователя в БД и получение на него ссылки:
 export const createUserProfileDocument = async (userAuth, additionalData) => {
+  // если данных по авторизации нет - возвращаем undefined:
   if (!userAuth) return;
 
+  // по uid пользователя из авторизации достаем ссылку на него в БД:
   const userRef = firestore.doc(`users/${userAuth.uid}`);
-
+  // по ссылке берем срез данных:
   const snapShot = await userRef.get();
   console.log(snapShot);
 
+  // если данные пустые, то создаем новую запись пользователя по информации из userAuth:
   if (!snapShot.exists) {
     const { displayName, email } = userAuth;
     const createdAt = new Date();
@@ -37,14 +41,19 @@ export const createUserProfileDocument = async (userAuth, additionalData) => {
     }
   }
 
+  // иначе просто возвращаем ссылку на пользователя:
   return userRef;
 };
 
 firebase.initializeApp(config);
 
+// приложения из firebase:
+// авторизация:
 export const auth = firebase.auth();
+// база данных NoSQL от Firebase (не Realtime-database)
 export const firestore = firebase.firestore();
 
+// провайдер для всплывашки и авторизации через Google:
 const provider = new firebase.auth.GoogleAuthProvider();
 provider.setCustomParameters({ prompt: "select_account" });
 export const signInWithGoogle = () => auth.signInWithPopup(provider);
