@@ -77,6 +77,25 @@ export const addCollectionAndDocuments = async (
     collectionsArray.map(({ title, items }) => ({ title, items }))
 ); */
 
+// фнукция для извлечения данных из snapshot firestore:
+export const convertCollectionsSnapshotToMap = (collections) => {
+  const transformedCollection = collections.docs.map((doc) => {
+    const { title, items } = doc.data();
+
+    return {
+      routeName: encodeURI(title.toLowerCase()),
+      id: doc.id,
+      title,
+      items,
+    };
+  });
+
+  return transformedCollection.reduce((accumulator, collection) => {
+    accumulator[collection.title.toLowerCase()] = collection;
+    return accumulator;
+  }, {});
+};
+
 // провайдер для всплывашки и авторизации через Google:
 const provider = new firebase.auth.GoogleAuthProvider();
 provider.setCustomParameters({ prompt: "select_account" });
