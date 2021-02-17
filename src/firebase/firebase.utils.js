@@ -53,6 +53,30 @@ export const auth = firebase.auth();
 // база данных NoSQL от Firebase (не Realtime-database)
 export const firestore = firebase.firestore();
 
+// функция для быстрого добавления коллекции (данных) в cloud firestore:
+export const addCollectionAndDocuments = async (
+  collectionKey,
+  objectsToAdd
+) => {
+  // firebase вернет collectionRef, если не найдет существующий, то вернет новый ref:
+  const collectionRef = firestore.collection(collectionKey);
+
+  const batch = firestore.batch();
+  objectsToAdd.forEach((obj) => {
+    // достаём ссылку на документ, в данном случае с пустым индексом (firebase сам его создаёт)
+    const newDocRef = collectionRef.doc();
+    batch.set(newDocRef, obj);
+  });
+
+  // коммитим, собранные в batch изменения:
+  return await batch.commit();
+};
+// пример использования:
+/* addCollectionAndDocuments(
+    "collections",
+    collectionsArray.map(({ title, items }) => ({ title, items }))
+); */
+
 // провайдер для всплывашки и авторизации через Google:
 const provider = new firebase.auth.GoogleAuthProvider();
 provider.setCustomParameters({ prompt: "select_account" });
