@@ -68,7 +68,7 @@ export const addCollectionAndDocuments = async (
     batch.set(newDocRef, obj);
   });
 
-  // коммитим, собранные в batch изменения:
+  // публикуем (фиксируем) собранные в batch изменения:
   return await batch.commit();
 };
 // пример использования:
